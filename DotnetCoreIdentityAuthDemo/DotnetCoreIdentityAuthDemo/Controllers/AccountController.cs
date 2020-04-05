@@ -70,15 +70,22 @@ namespace DotnetCoreIdentityAuthDemo.Controllers
         }
 
         [HttpPost]
-        [AllowAnonymous]
-        public async Task<IActionResult> Login(LoginViewModel loginViewModel)
+        [AllowAnonymous // returnUrl is defined by dotnet core using Modelbinding. So built in method in url define this value at time of login.
+        public async Task<IActionResult> Login(LoginViewModel loginViewModel, string returnUrl)
         {
             if (ModelState.IsValid)
             {
                 var result = await signInManager.PasswordSignInAsync(loginViewModel.Email, loginViewModel.Password, loginViewModel.RememberMe, false);
                 if (result.Succeeded)
                 {
-                    return RedirectToAction("index", "home");
+                    if (!string.IsNullOrEmpty(returnUrl))
+                    {
+                        return Redirect(returnUrl);
+                    }
+                    else
+                    {
+                        return RedirectToAction("index", "home");
+                    }
                 }
                 // If there are any errors, add them to the ModelState object
                 // which will be displayed by the validation summary tag helper
