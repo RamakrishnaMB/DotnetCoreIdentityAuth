@@ -70,7 +70,7 @@ namespace DotnetCoreIdentityAuthDemo.Controllers
         }
 
         [HttpPost]
-        [AllowAnonymous // returnUrl is defined by dotnet core using Modelbinding. So built in method in url define this value at time of login.
+        [AllowAnonymous] // returnUrl is defined by dotnet core using Modelbinding. So built in method in url define this value at time of login.
         public async Task<IActionResult> Login(LoginViewModel loginViewModel, string returnUrl)
         {
             if (ModelState.IsValid)
@@ -78,9 +78,10 @@ namespace DotnetCoreIdentityAuthDemo.Controllers
                 var result = await signInManager.PasswordSignInAsync(loginViewModel.Email, loginViewModel.Password, loginViewModel.RememberMe, false);
                 if (result.Succeeded)
                 {
-                    if (!string.IsNullOrEmpty(returnUrl))
+                    // to prevent Open redirect vulnerability example
+                    if (!string.IsNullOrEmpty(returnUrl) && Url.IsLocalUrl(returnUrl))
                     {
-                        return Redirect(returnUrl);
+                        return LocalRedirect(returnUrl);
                     }
                     else
                     {
