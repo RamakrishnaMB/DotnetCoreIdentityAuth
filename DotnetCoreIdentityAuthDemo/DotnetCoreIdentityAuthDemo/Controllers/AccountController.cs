@@ -21,19 +21,20 @@ namespace DotnetCoreIdentityAuthDemo.Controllers
         }
 
         [HttpGet]
+        [AllowAnonymous]
         public IActionResult Register()
         {
             return View();
         }
 
         [HttpPost]
+        [AllowAnonymous]
         public async Task<IActionResult> RegisterAsync(RegisterViewModel registerViewModel)
         {
             if (ModelState.IsValid)
             {
                 var user = new IdentityUser { UserName = registerViewModel.Email, Email = registerViewModel.Email };
                 var result = await userManager.CreateAsync(user, registerViewModel.Password);
-
                 if (result.Succeeded)
                 {
                     await signInManager.SignInAsync(user, isPersistent: false);
@@ -45,10 +46,7 @@ namespace DotnetCoreIdentityAuthDemo.Controllers
                 {
                     ModelState.AddModelError(string.Empty, error.Description);
                 }
-
             }
-
-
             return View(registerViewModel);
         }
 
@@ -91,9 +89,24 @@ namespace DotnetCoreIdentityAuthDemo.Controllers
                 // If there are any errors, add them to the ModelState object
                 // which will be displayed by the validation summary tag helper
                 ModelState.AddModelError(string.Empty, "Invalid Login Attempt");
-
             }
             return View(loginViewModel);
+        }
+
+
+        [AcceptVerbs("Get","Post")]
+        [AllowAnonymous]
+        public async Task<IActionResult> IsEmailInuser(string email)
+        {
+            var user=  await userManager.FindByEmailAsync(email);
+            if(user == null)
+            {
+                return Json(true);
+            }
+            else
+            {
+                return Json($"Email {email} is already in use");
+            }
         }
 
     }
