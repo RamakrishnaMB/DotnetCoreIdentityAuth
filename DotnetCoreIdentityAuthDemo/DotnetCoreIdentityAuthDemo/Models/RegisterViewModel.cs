@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using DotnetCoreIdentityAuthDemo.Utilities;
+using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
@@ -12,6 +13,7 @@ namespace DotnetCoreIdentityAuthDemo.Models
         [Required]
         [EmailAddress]
         [Remote(action: "IsEmailInuser", controller: "Account")]
+        [ValidEmailDomainAttribute(allowedDomain: "test.com", ErrorMessage = "This email domain not allowed! only test.com")]
         public string Email { get; set; }
 
         [Required]
