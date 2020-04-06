@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using DotnetCoreIdentityAuthDemo.Models;
+using DotnetCoreIdentityAuthDemo.Models.ExtendUser;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -28,7 +29,7 @@ namespace DotnetCoreIdentityAuthDemo
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddDbContext<ConnectToDB>(options => options.UseSqlServer(Configuration.GetConnectionString("DBConnection")));
-            services.AddIdentity<IdentityUser, IdentityRole>(options =>
+            services.AddIdentity<CustomUser, IdentityRole>(options =>
             {
                 options.Password.RequiredLength = 3;
                 options.Password.RequireDigit = false;

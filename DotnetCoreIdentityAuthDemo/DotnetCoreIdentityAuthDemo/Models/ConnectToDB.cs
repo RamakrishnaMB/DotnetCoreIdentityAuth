@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
+﻿using DotnetCoreIdentityAuthDemo.Models.ExtendUser;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
@@ -7,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace DotnetCoreIdentityAuthDemo.Models
 {
-    public class ConnectToDB: IdentityDbContext
+    public class ConnectToDB: IdentityDbContext<CustomUser>
     {
         public ConnectToDB(DbContextOptions<ConnectToDB> options)
         : base(options)

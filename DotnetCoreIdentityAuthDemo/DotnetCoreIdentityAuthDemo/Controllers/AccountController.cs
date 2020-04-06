@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using DotnetCoreIdentityAuthDemo.Models;
+using DotnetCoreIdentityAuthDemo.Models.ExtendUser;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
@@ -11,10 +12,10 @@ namespace DotnetCoreIdentityAuthDemo.Controllers
 {
     public class AccountController : Controller
     {
-        private readonly UserManager<IdentityUser> userManager;
-        private readonly SignInManager<IdentityUser> signInManager;
+        private readonly UserManager<CustomUser> userManager;
+        private readonly SignInManager<CustomUser> signInManager;
 
-        public AccountController(UserManager<IdentityUser> userManager, SignInManager<IdentityUser> signInManager)
+        public AccountController(UserManager<CustomUser> userManager, SignInManager<CustomUser> signInManager)
         {
             this.userManager = userManager;
             this.signInManager = signInManager;
@@ -33,7 +34,14 @@ namespace DotnetCoreIdentityAuthDemo.Controllers
         {
             if (ModelState.IsValid)
             {
-                var user = new IdentityUser { UserName = registerViewModel.Email, Email = registerViewModel.Email };
+                var user = new CustomUser
+                {
+                    UserName = registerViewModel.Email,
+                    Email = registerViewModel.Email,
+                    City = registerViewModel.City,
+                    LastName = registerViewModel.LastName,
+                    FirstName = registerViewModel.FirstName
+                };
                 var result = await userManager.CreateAsync(user, registerViewModel.Password);
                 if (result.Succeeded)
                 {
@@ -94,12 +102,12 @@ namespace DotnetCoreIdentityAuthDemo.Controllers
         }
 
 
-        [AcceptVerbs("Get","Post")]
+        [AcceptVerbs("Get", "Post")]
         [AllowAnonymous]
         public async Task<IActionResult> IsEmailInuser(string email)
         {
-            var user=  await userManager.FindByEmailAsync(email);
-            if(user == null)
+            var user = await userManager.FindByEmailAsync(email);
+            if (user == null)
             {
                 return Json(true);
             }
