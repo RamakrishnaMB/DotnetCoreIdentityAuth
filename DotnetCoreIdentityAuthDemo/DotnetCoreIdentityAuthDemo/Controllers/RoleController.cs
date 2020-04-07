@@ -36,7 +36,7 @@ namespace DotnetCoreIdentityAuthDemo.Controllers
 
                 if (result.Succeeded)
                 {
-                    return RedirectToAction("index", "home");
+                    return RedirectToAction("listroles", "role");
                 }
 
                 foreach (IdentityError error in result.Errors)
@@ -45,6 +45,13 @@ namespace DotnetCoreIdentityAuthDemo.Controllers
                 }
             }
             return View(createRoleViewModel);
+        }
+
+        [HttpGet]
+        public IActionResult ListRoles()
+        {
+            var roles = roleManager.Roles;
+            return View(roles);
         }
     }
 }
