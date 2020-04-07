@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using DotnetCoreIdentityAuthDemo.Models.ExtendUser;
 using DotnetCoreIdentityAuthDemo.Models.Roles;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
@@ -11,10 +12,12 @@ namespace DotnetCoreIdentityAuthDemo.Controllers
     public class RoleController : Controller
     {
         private readonly RoleManager<IdentityRole> roleManager;
+        private readonly UserManager<CustomUser> userManager;
 
-        public RoleController(RoleManager<IdentityRole> roleManager)
+        public RoleController(RoleManager<IdentityRole> roleManager, UserManager<CustomUser> userManager)
         {
             this.roleManager = roleManager;
+            this.userManager = userManager;
         }
         [HttpGet]
         public IActionResult CreateRole()
@@ -52,6 +55,63 @@ namespace DotnetCoreIdentityAuthDemo.Controllers
         {
             var roles = roleManager.Roles;
             return View(roles);
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> EditRoleAsync(string Id)
+        {
+            var role = await roleManager.FindByIdAsync(Id);
+
+            if (role == null)
+            {
+                ViewBag.ErrorMessage = $"Role with Id ={Id} cannot be found";
+                return View("Error");
+            }
+            var model = new EditRoleViewModel
+            {
+                Id = role.Id,
+                RoleName = role.Name
+            };
+
+            foreach (var user in userManager.Users.ToList())
+            {
+                if (await userManager.IsInRoleAsync(user, role.Name))
+                {
+                    model.Users.Add(user.UserName);
+                }
+            }
+            return View(model);
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> EditRoleAsync(EditRoleViewModel editRoleViewModel)
+        {
+            var role = await roleManager.FindByIdAsync(editRoleViewModel.Id);
+
+            if (role == null)
+            {
+                ViewBag.ErrorMessage = $"Role with Id ={editRoleViewModel.Id} cannot be found";
+                return View("Error");
+            }
+            else
+            {
+                role.Name = editRoleViewModel.RoleName;
+                var result = await roleManager.UpdateAsync(role);
+
+                if(result.Succeeded)
+                {
+                    return RedirectToAction(nameof(ListRoles));
+                }
+
+                foreach (var error in result.Errors)
+                {
+                    ModelState.AddModelError("", error.Description);
+                }
+            }
+         
+
+        
+            return View(editRoleViewModel);
         }
     }
 }
