@@ -1,4 +1,4 @@
-﻿@inject SignInManager<DotnetCoreIdentityAuthDemo.Models.ExtendUser.CustomUser > signInManager;
+﻿@inject SignInManager<DotnetCoreIdentityAuthDemo.Models.ExtendUser.CustomUser> signInManager;
 
 <!DOCTYPE html>
 <html lang="en">
@@ -34,15 +34,18 @@
                         <li class="nav-item">
                             <a class="nav-link text-dark" asp-area="" asp-controller="Role" asp-action="ListRoles">Roles List</a>
                         </li>
-
-                        <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="AdminTest" asp-action="Index">Admin Page</a>
-                        </li>
-
-                        <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="UserTest" asp-action="Index">User Page</a>
-                        </li>
-
+                        @if (signInManager.IsSignedIn(User) && User.IsInRole("admin"))
+                        {
+                            <li class="nav-item">
+                                <a class="nav-link text-dark" asp-area="" asp-controller="AdminTest" asp-action="Index">Admin Page</a>
+                            </li>
+                        }
+                        @if (signInManager.IsSignedIn(User) && (User.IsInRole("admin") || User.IsInRole("user")))
+                        {
+                            <li class="nav-item">
+                                <a class="nav-link text-dark" asp-area="" asp-controller="UserTest" asp-action="Index">User Page</a>
+                            </li>
+                        }
                         @if (signInManager.IsSignedIn(User))
                         {
                             <li class="nav-item">

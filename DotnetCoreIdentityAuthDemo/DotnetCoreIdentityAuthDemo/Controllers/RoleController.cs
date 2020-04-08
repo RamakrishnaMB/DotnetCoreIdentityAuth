@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using DotnetCoreIdentityAuthDemo.Models;
 using DotnetCoreIdentityAuthDemo.Models.ExtendUser;
 using DotnetCoreIdentityAuthDemo.Models.Roles;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 
@@ -50,7 +51,7 @@ namespace DotnetCoreIdentityAuthDemo.Controllers
                 }
             }
             return View(createRoleViewModel);
-        } 
+        }
         #endregion
 
         [HttpGet]
