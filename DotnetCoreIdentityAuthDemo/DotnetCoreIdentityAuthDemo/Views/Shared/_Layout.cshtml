@@ -31,11 +31,20 @@
                             <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
                         </li>
 
-                        <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Role" asp-action="ListRoles">Roles List</a>
-                        </li>
+
                         @if (signInManager.IsSignedIn(User) && User.IsInRole("admin"))
                         {
+                            <li class="nav-item dropdown">
+                                <a class="nav-link dropdown-toggle" href="#" id="navbarDropdownMenuLink"
+                                   data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                    Manage
+                                </a>
+                                <div class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink">
+                                    <a class="nav-link text-dark" asp-area="" asp-controller="Users" asp-action="ListUsers">Users List</a>
+                                    <a class="nav-link text-dark" asp-area="" asp-controller="Role" asp-action="ListRoles">Roles List</a>
+                                </div>
+                            </li>
+
                             <li class="nav-item">
                                 <a class="nav-link text-dark" asp-area="" asp-controller="AdminTest" asp-action="Index">Admin Page</a>
                             </li>

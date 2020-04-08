@@ -45,6 +45,10 @@ namespace DotnetCoreIdentityAuthDemo.Controllers
                 var result = await userManager.CreateAsync(user, registerViewModel.Password);
                 if (result.Succeeded)
                 {
+                    if (signInManager.IsSignedIn(User) && User.IsInRole("admin"))// In case of admin role logged in .... just redirect to List user page.
+                    {
+                        return RedirectToAction("ListUsers", "Users");
+                    }
                     await signInManager.SignInAsync(user, isPersistent: false);
                     return RedirectToAction("index", "home");
                 }
