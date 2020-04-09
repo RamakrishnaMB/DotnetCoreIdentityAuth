@@ -4,14 +4,16 @@ using DotnetCoreIdentityAuthDemo.Models;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace DotnetCoreIdentityAuthDemo.Migrations
 {
     [DbContext(typeof(ConnectToDB))]
-    partial class ConnectToDBModelSnapshot : ModelSnapshot
+    [Migration("20200409144336_restrictCascadeonDelete")]
+    partial class restrictCascadeonDelete
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
