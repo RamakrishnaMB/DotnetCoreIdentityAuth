@@ -114,7 +114,7 @@ namespace DotnetCoreIdentityAuthDemo.Controllers
                 }
             }
             return View(editRoleViewModel);
-        } 
+        }
         #endregion
 
         #region Add or remove users to existing roles 
@@ -186,7 +186,36 @@ namespace DotnetCoreIdentityAuthDemo.Controllers
                 }
             }
             return RedirectToAction("EditRole", new { Id = roleId });
-        } 
+        }
+        #endregion
+
+        #region DeleteRole
+        [HttpPost]
+        public async Task<IActionResult> DeleteRole(string Id)
+        {
+            var role = await roleManager.FindByIdAsync(Id);
+            if (role == null)
+            {
+                ViewBag.ErrorMessage = $"Role with Id = {Id} cannot be found";
+                return View("Error");
+            }
+            else
+            {
+                var result = await roleManager.DeleteAsync(role);
+
+                if (result.Succeeded)
+                {
+                    return RedirectToAction("ListRoles");
+                }
+
+                foreach (var error in result.Errors)
+                {
+                    ModelState.AddModelError("", error.Description);
+                }
+                return View("ListRoles");
+            }
+        }
+        
         #endregion
     }
 }

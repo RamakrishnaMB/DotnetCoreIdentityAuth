@@ -23,8 +23,11 @@
                 <h5 class="card-title">@role.Name</h5>
             </div>
             <div class="card-footer">
-                <a asp-controller="Role" asp-action="EditRole" asp-route-id="@role.Id" class="btn btn-primary">Edit</a>
-                <a class="btn btn-danger">Delete</a>
+        
+                <form method="post" asp-action="DeleteRole" asp-route-id="@role.Id">
+                    <a asp-controller="Role" asp-action="EditRole" asp-route-id="@role.Id" class="btn btn-primary">Edit</a>
+                    <button type="submit" class="btn btn-danger" onclick="return confirm('Are you sure you want to delete Role: @role.Name')">Delete</button>
+                </form>
             </div>
         </div>
     }
