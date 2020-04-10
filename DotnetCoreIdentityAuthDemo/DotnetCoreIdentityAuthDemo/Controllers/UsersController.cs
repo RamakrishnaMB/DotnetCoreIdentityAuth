@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Claims;
 using System.Threading.Tasks;
+using DotnetCoreIdentityAuthDemo.Models.Claims;
 using DotnetCoreIdentityAuthDemo.Models.ExtendUser;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
@@ -16,6 +18,80 @@ namespace DotnetCoreIdentityAuthDemo.Controllers
         {
             this.userManager = userManager;
         }
+
+
+        #region Manage user claim
+        [HttpGet]
+        public async Task<IActionResult> ManageUserClaims(string userId)
+        {
+            var user = await userManager.FindByIdAsync(userId);
+
+            if(user == null)
+            {
+                ViewBag.ErrorMessage = $"User with Id ={userId} cannot be found";
+                return View("Error");
+            }
+            var existingUserClaims = await userManager.GetClaimsAsync(user);
+
+            var model = new UserClaimsViewModel
+            {
+                UserId = userId
+            };
+
+            foreach(Claim claim in ClaimsStore.AllClaims)
+            {
+                UserClaim userClaim = new UserClaim
+                {
+                    ClaimType = claim.Type
+                };
+
+                if(existingUserClaims.Any( c => c.Type == claim.Type))
+                {
+                    userClaim.IsSelected = true;
+                }
+                model.Cliams.Add(userClaim);
+            }
+            return View(model);
+        }
+
+
+        [HttpPost]
+        public async Task<IActionResult> ManageUserClaims(UserClaimsViewModel model)
+        {
+            var user = await userManager.FindByIdAsync(model.UserId);
+
+            if (user == null)
+            {
+                ViewBag.ErrorMessage = $"User with Id = {model.UserId} cannot be found";
+                return View("Error");
+            }
+
+            // Get all the user existing claims and delete them
+            var claims = await userManager.GetClaimsAsync(user);
+            var result = await userManager.RemoveClaimsAsync(user, claims);
+
+            if (!result.Succeeded)
+            {
+                ModelState.AddModelError("", "Cannot remove user existing claims");
+                return View(model);
+            }
+
+            // Add all the claims that are selected on the UI
+            result = await userManager.AddClaimsAsync(user,
+                model.Cliams.Where(c => c.IsSelected).Select(c => new Claim(c.ClaimType, c.ClaimType)));
+
+            if (!result.Succeeded)
+            {
+                ModelState.AddModelError("", "Cannot add selected claims to user");
+                return View(model);
+            }
+
+            return RedirectToAction(nameof(EditUser), new { Id = model.UserId });
+
+        }
+
+
+        #endregion
 
         [HttpGet]
         public IActionResult ListUsers()
@@ -112,6 +188,9 @@ namespace DotnetCoreIdentityAuthDemo.Controllers
                 return View("ListUsers");
             }
         }
+
+
+       
 
     }
 }
