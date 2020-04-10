@@ -5,6 +5,7 @@ using System.Security.Claims;
 using System.Threading.Tasks;
 using DotnetCoreIdentityAuthDemo.Models.Claims;
 using DotnetCoreIdentityAuthDemo.Models.ExtendUser;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 
@@ -162,6 +163,7 @@ namespace DotnetCoreIdentityAuthDemo.Controllers
 
         [HttpDelete]
         [HttpPost]
+        [Authorize(Policy = "DeleteClaimPolicy")]
         public async Task<IActionResult> DeleteUser(string id)
         {
             var user = await userManager.FindByIdAsync(id);
