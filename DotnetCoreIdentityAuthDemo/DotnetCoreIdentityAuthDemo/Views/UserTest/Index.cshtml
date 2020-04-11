@@ -1,7 +1,21 @@
-﻿
+﻿@using Microsoft.AspNetCore.Authorization
+@inject IAuthorizationService authroizationService
+
+
 @{
     ViewData["Title"] = "Index";
 }
 
+
 <h1>This user test page to check user role login!!!</h1>
+
+
+@if ((await authroizationService.AuthorizeAsync(User, "ViewOnlyRolePolicy")).Succeeded)
+{
+    <h1>This user in ViewOnlyRolePolicy</h1>
+}
+else
+{
+    <h1>This user not in ViewOnlyRolePolicy</h1>
+}
 

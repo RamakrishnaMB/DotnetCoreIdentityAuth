@@ -49,6 +49,10 @@ namespace DotnetCoreIdentityAuthDemo
             services.AddAuthorization(options => {
                 options.AddPolicy("DeleteClaimPolicy", policy => policy.RequireClaim("Delete Role"));
             });
+
+            services.AddAuthorization(options => {
+                options.AddPolicy("ViewOnlyRolePolicy", policy => policy.RequireClaim("View Role"));
+            });
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
