@@ -27,7 +27,7 @@ namespace DotnetCoreIdentityAuthDemo.Controllers
         {
             var user = await userManager.FindByIdAsync(userId);
 
-            if(user == null)
+            if (user == null)
             {
                 ViewBag.ErrorMessage = $"User with Id ={userId} cannot be found";
                 return View("Error");
@@ -39,14 +39,14 @@ namespace DotnetCoreIdentityAuthDemo.Controllers
                 UserId = userId
             };
 
-            foreach(Claim claim in ClaimsStore.AllClaims)
+            foreach (Claim claim in ClaimsStore.AllClaims)
             {
                 UserClaim userClaim = new UserClaim
                 {
                     ClaimType = claim.Type
                 };
 
-                if(existingUserClaims.Any( c => c.Type == claim.Type))
+                if (existingUserClaims.Any(c => c.Type == claim.Type && c.Value == "true"))
                 {
                     userClaim.IsSelected = true;
                 }
@@ -79,7 +79,7 @@ namespace DotnetCoreIdentityAuthDemo.Controllers
 
             // Add all the claims that are selected on the UI
             result = await userManager.AddClaimsAsync(user,
-                model.Cliams.Where(c => c.IsSelected).Select(c => new Claim(c.ClaimType, c.ClaimType)));
+                model.Cliams.Select(c => new Claim(c.ClaimType, c.IsSelected ? "true" : "false")));
 
             if (!result.Succeeded)
             {
@@ -122,7 +122,7 @@ namespace DotnetCoreIdentityAuthDemo.Controllers
                 UserName = user.UserName,
                 City = user.City,
                 Roles = userRoles,
-                Claims = userClaims.Select(c => c.Value).ToList()
+                Claims = userClaims.Select(c => c.Type + " : " + c.Value).ToList()
             };
 
             return View(model);
@@ -192,7 +192,7 @@ namespace DotnetCoreIdentityAuthDemo.Controllers
         }
 
 
-       
+
 
     }
 }

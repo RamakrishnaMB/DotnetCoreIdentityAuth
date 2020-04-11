@@ -47,11 +47,11 @@ namespace DotnetCoreIdentityAuthDemo
             services.AddControllersWithViews();
 
             services.AddAuthorization(options => {
-                options.AddPolicy("DeleteClaimPolicy", policy => policy.RequireClaim("Delete Role"));
+                options.AddPolicy("DeleteClaimPolicy", policy => policy.RequireClaim("Delete Role","true"));
             });
 
             services.AddAuthorization(options => {
-                options.AddPolicy("ViewOnlyRolePolicy", policy => policy.RequireClaim("View Role"));
+                options.AddPolicy("ViewOnlyRolePolicy", policy => policy.RequireClaim("View Role","true"));
             });
         }
 
