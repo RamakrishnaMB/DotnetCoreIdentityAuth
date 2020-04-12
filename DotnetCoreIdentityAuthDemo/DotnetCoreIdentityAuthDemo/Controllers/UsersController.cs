@@ -103,7 +103,7 @@ namespace DotnetCoreIdentityAuthDemo.Controllers
         }
 
         [HttpGet]
-        [Authorize(Policy = "EditRolePolicy")]
+        [Authorize(Policy = "CustomRolePolicy")]
         public async Task<IActionResult> EditUser(string Id)
         {
             var user = await userManager.FindByIdAsync(Id);
@@ -126,7 +126,6 @@ namespace DotnetCoreIdentityAuthDemo.Controllers
                 Roles = userRoles,
                 Claims = userClaims.Select(c => c.Type + " : " + c.Value).ToList()
             };
-
             return View(model);
         }
 

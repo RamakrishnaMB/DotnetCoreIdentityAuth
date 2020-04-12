@@ -12,11 +12,13 @@
 
 @if ((await authroizationService.AuthorizeAsync(User, "SuperAdminRolePolicy")).Succeeded)
 {
-    <p>
-        Must be member of the Admin role AND
-        Must have Edit Role claim witha a value of true or
-        Must be a member of the Super Admin role
-    </p>
+<p>
+    Must be member of the Admin role AND
+    Must have Edit Role claim witha a value of true or
+    Must be a member of the Super Admin role
+    <br />
+    This user in SuperAdminRolePolicy policy.
+</p>
 
 }
 

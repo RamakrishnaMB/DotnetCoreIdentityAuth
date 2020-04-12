@@ -58,10 +58,11 @@ namespace DotnetCoreIdentityAuthDemo
                 options.AddPolicy("DeleteClaimPolicy", policy => policy.RequireClaim("Delete Role", "true"));
                 options.AddPolicy("ViewOnlyRolePolicy", policy => policy.RequireClaim("View Role", "true"));
 
-                options.AddPolicy("EditRolePolicy", policy => policy.AddRequirements(new ManageAdminRolesAndClaimsRequirement()));
+                options.AddPolicy("CustomRolePolicy", policy => policy.AddRequirements(new ManageAdminRolesAndClaimsRequirement()));
             });
 
             services.AddSingleton<IAuthorizationHandler, CanEditOnlyOtherAdminRolesAndClaimsHandler>();
+            services.AddSingleton<IAuthorizationHandler, SuperAdminHandler>();
 
         }
 
