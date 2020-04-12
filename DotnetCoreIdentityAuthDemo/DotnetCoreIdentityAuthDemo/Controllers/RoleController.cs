@@ -55,6 +55,7 @@ namespace DotnetCoreIdentityAuthDemo.Controllers
         #endregion
 
         [HttpGet]
+        //[Authorize(Policy = "EditRolePolicy")]
         public IActionResult ListRoles()
         {
             var roles = roleManager.Roles;
@@ -63,13 +64,14 @@ namespace DotnetCoreIdentityAuthDemo.Controllers
 
         #region Edit role 
         [HttpGet]
-        public async Task<IActionResult> EditRoleAsync(string Id)
+        
+        public async Task<IActionResult> EditRoleAsync(string userId)
         {
-            var role = await roleManager.FindByIdAsync(Id);
+            var role = await roleManager.FindByIdAsync(userId);
 
             if (role == null)
             {
-                ViewBag.ErrorMessage = $"Role with Id ={Id} cannot be found";
+                ViewBag.ErrorMessage = $"Role with Id ={userId} cannot be found";
                 return View("Error");
             }
             var model = new EditRoleViewModel

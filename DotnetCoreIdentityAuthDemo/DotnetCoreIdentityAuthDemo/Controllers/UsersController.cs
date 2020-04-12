@@ -23,6 +23,7 @@ namespace DotnetCoreIdentityAuthDemo.Controllers
 
         #region Manage user claim
         [HttpGet]
+        
         public async Task<IActionResult> ManageUserClaims(string userId)
         {
             var user = await userManager.FindByIdAsync(userId);
@@ -102,6 +103,7 @@ namespace DotnetCoreIdentityAuthDemo.Controllers
         }
 
         [HttpGet]
+        [Authorize(Policy = "EditRolePolicy")]
         public async Task<IActionResult> EditUser(string Id)
         {
             var user = await userManager.FindByIdAsync(Id);

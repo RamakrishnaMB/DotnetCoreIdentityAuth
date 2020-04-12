@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using DotnetCoreIdentityAuthDemo.Models;
 using DotnetCoreIdentityAuthDemo.Models.ExtendUser;
+using DotnetCoreIdentityAuthDemo.Security;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -45,7 +46,7 @@ namespace DotnetCoreIdentityAuthDemo
                    options.Filters.Add(new AuthorizeFilter(pilicy));
                });
             services.AddControllersWithViews();
-
+           
             services.AddAuthorization(options =>
             {
 
@@ -57,10 +58,10 @@ namespace DotnetCoreIdentityAuthDemo
                 options.AddPolicy("DeleteClaimPolicy", policy => policy.RequireClaim("Delete Role", "true"));
                 options.AddPolicy("ViewOnlyRolePolicy", policy => policy.RequireClaim("View Role", "true"));
 
-
+                options.AddPolicy("EditRolePolicy", policy => policy.AddRequirements(new ManageAdminRolesAndClaimsRequirement()));
             });
 
-
+            services.AddSingleton<IAuthorizationHandler, CanEditOnlyOtherAdminRolesAndClaimsHandler>();
 
         }
 
