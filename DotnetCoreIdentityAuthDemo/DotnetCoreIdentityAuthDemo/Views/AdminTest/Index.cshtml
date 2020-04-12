@@ -1,7 +1,22 @@
-﻿
+﻿@using Microsoft.AspNetCore.Authorization
+@inject IAuthorizationService authroizationService
 @{
     ViewData["Title"] = "Index";
 }
 
 <h1>This is admin role page, to check admin login !!!!</h1>
+
+
+
+
+
+@if ((await authroizationService.AuthorizeAsync(User, "SuperAdminRolePolicy")).Succeeded)
+{
+    <p>
+        Must be member of the Admin role AND
+        Must have Edit Role claim witha a value of true or
+        Must be a member of the Super Admin role
+    </p>
+
+}
 

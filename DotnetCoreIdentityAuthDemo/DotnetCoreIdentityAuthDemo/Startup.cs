@@ -46,13 +46,22 @@ namespace DotnetCoreIdentityAuthDemo
                });
             services.AddControllersWithViews();
 
-            services.AddAuthorization(options => {
-                options.AddPolicy("DeleteClaimPolicy", policy => policy.RequireClaim("Delete Role","true"));
+            services.AddAuthorization(options =>
+            {
+
+                options.AddPolicy("SuperAdminRolePolicy", policy => policy.RequireAssertion(context =>
+                    (context.User.IsInRole("admin") &&
+                    context.User.HasClaim(claim => claim.Type == "Edit Role" && claim.Value == "true")) ||
+                    context.User.IsInRole("super admin")
+                ));
+                options.AddPolicy("DeleteClaimPolicy", policy => policy.RequireClaim("Delete Role", "true"));
+                options.AddPolicy("ViewOnlyRolePolicy", policy => policy.RequireClaim("View Role", "true"));
+
+
             });
 
-            services.AddAuthorization(options => {
-                options.AddPolicy("ViewOnlyRolePolicy", policy => policy.RequireClaim("View Role","true"));
-            });
+
+
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

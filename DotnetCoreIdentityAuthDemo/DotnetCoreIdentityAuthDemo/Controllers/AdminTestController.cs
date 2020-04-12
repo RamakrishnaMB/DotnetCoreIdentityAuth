@@ -7,7 +7,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace DotnetCoreIdentityAuthDemo.Controllers
 {
-    [Authorize(Roles ="admin")]
+    [Authorize(Policy = "SuperAdminRolePolicy")]
     public class AdminTestController : Controller
     {
         public IActionResult Index()
