@@ -51,7 +51,14 @@ namespace DotnetCoreIdentityAuthDemo
             {
                 optns.ClientId = "520343172682-qgp4tundmcnsq6p3u53n6fc152435v35.apps.googleusercontent.com";
                 optns.ClientSecret = "N6Wok5HJ_N5AYuCesC0j0m_z";
+            })
+            .AddFacebook(options =>
+            {
+                options.AppId = "2579394669054559";
+                options.AppSecret = "28363731d01355e6771e7f797dcfaaed";
             });
+
+
 
             services.AddAuthorization(options =>
             {
