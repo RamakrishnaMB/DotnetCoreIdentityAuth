@@ -21,6 +21,7 @@ namespace DotnetCoreIdentityAuthDemo.Controllers
             this.signInManager = signInManager;
         }
 
+        #region Register 
         [HttpGet]
         [AllowAnonymous]
         public IActionResult Register()
@@ -62,6 +63,7 @@ namespace DotnetCoreIdentityAuthDemo.Controllers
             return View(registerViewModel);
         }
 
+        #endregion
 
 
         [HttpPost]
@@ -71,12 +73,17 @@ namespace DotnetCoreIdentityAuthDemo.Controllers
             return RedirectToAction("index", "home");
         }
 
+        #region Login
 
         [HttpGet]
         [AllowAnonymous]
-        public IActionResult Login()
+        public async Task<IActionResult> LoginAsync(string returnUrl)
         {
-            return View();
+            LoginViewModel loginViewModel = new LoginViewModel();
+            loginViewModel.ReturnUrl = returnUrl;
+            loginViewModel.ExternalLogins = (await signInManager.GetExternalAuthenticationSchemesAsync()).ToList();
+
+            return View(loginViewModel);
         }
 
         [HttpPost]
@@ -105,6 +112,7 @@ namespace DotnetCoreIdentityAuthDemo.Controllers
             return View(loginViewModel);
         }
 
+        #endregion
 
         [AcceptVerbs("Get", "Post")]
         [AllowAnonymous]
@@ -128,5 +136,16 @@ namespace DotnetCoreIdentityAuthDemo.Controllers
             return View();
         }
 
+
+        [AllowAnonymous]
+        [HttpPost]
+        public IActionResult ExternalLogin(string provider, string returnUrl)
+        {
+            var redirectUrl = Url.Action("ExternalLoginCallback", "Account",
+                                new { ReturnUrl = returnUrl });
+            var properties = signInManager
+                .ConfigureExternalAuthenticationProperties(provider, redirectUrl);
+            return new ChallengeResult(provider, properties);
+        }
     }
 }

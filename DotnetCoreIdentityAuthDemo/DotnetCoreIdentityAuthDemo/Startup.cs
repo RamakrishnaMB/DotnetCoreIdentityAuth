@@ -46,7 +46,13 @@ namespace DotnetCoreIdentityAuthDemo
                    options.Filters.Add(new AuthorizeFilter(pilicy));
                });
             services.AddControllersWithViews();
-           
+
+            services.AddAuthentication().AddGoogle(optns =>
+            {
+                optns.ClientId = "520343172682-qgp4tundmcnsq6p3u53n6fc152435v35.apps.googleusercontent.com";
+                optns.ClientSecret = "N6Wok5HJ_N5AYuCesC0j0m_z";
+            });
+
             services.AddAuthorization(options =>
             {
 
