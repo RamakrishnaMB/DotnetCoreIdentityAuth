@@ -91,8 +91,20 @@ namespace DotnetCoreIdentityAuthDemo.Controllers
         [AllowAnonymous] // returnUrl is defined by dotnet core using Modelbinding. So built in method in url define this value at time of login.
         public async Task<IActionResult> Login(LoginViewModel loginViewModel, string returnUrl)
         {
+            loginViewModel.ExternalLogins = (await signInManager.GetExternalAuthenticationSchemesAsync()).ToList();
             if (ModelState.IsValid)
             {
+                #region check email confirmation has been done for the user
+
+                //var user = await userManager.FindByEmailAsync(loginViewModel.Email);
+
+                //if (user != null && !user.EmailConfirmed && (await userManager.CheckPasswordAsync(user, loginViewModel.Password)))
+                //{
+                //    ModelState.AddModelError(string.Empty, "Email Not confirmed yer!!");
+                //    return View(loginViewModel);
+                //}
+                #endregion
+
                 var result = await signInManager.PasswordSignInAsync(loginViewModel.Email, loginViewModel.Password, loginViewModel.RememberMe, false);
                 if (result.Succeeded)
                 {

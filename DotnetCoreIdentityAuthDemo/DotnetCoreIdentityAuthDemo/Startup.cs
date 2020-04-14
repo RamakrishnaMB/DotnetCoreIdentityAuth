@@ -38,6 +38,7 @@ namespace DotnetCoreIdentityAuthDemo
                 options.Password.RequireDigit = false;
                 options.Password.RequireNonAlphanumeric = false;
                 options.Password.RequireUppercase = false;
+                options.SignIn.RequireConfirmedEmail = false;
             }).AddEntityFrameworkStores<ConnectToDB>();
 
             services.AddMvc(options =>
