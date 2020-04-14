@@ -8,6 +8,7 @@ using DotnetCoreIdentityAuthDemo.Models.ExtendUser;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Logging;
 
 namespace DotnetCoreIdentityAuthDemo.Controllers
 {
@@ -15,11 +16,13 @@ namespace DotnetCoreIdentityAuthDemo.Controllers
     {
         private readonly UserManager<CustomUser> userManager;
         private readonly SignInManager<CustomUser> signInManager;
+        private readonly ILogger<AccountController> logger;
 
-        public AccountController(UserManager<CustomUser> userManager, SignInManager<CustomUser> signInManager)
+        public AccountController(UserManager<CustomUser> userManager, SignInManager<CustomUser> signInManager, ILogger<AccountController> logger)
         {
             this.userManager = userManager;
             this.signInManager = signInManager;
+            this.logger = logger;
         }
 
         #region Register 
@@ -47,12 +50,19 @@ namespace DotnetCoreIdentityAuthDemo.Controllers
                 var result = await userManager.CreateAsync(user, registerViewModel.Password);
                 if (result.Succeeded)
                 {
+                    var token = await userManager.GenerateEmailConfirmationTokenAsync(user);
+                    var confirmationLink = Url.Action("ConfirmEmail", "Account", new { userId = user.Id, token = token }, Request.Scheme);
+
+                    logger.Log(LogLevel.Warning, confirmationLink);
+
                     if (signInManager.IsSignedIn(User) && User.IsInRole("admin"))// In case of admin role logged in .... just redirect to List user page.
                     {
                         return RedirectToAction("ListUsers", "Users");
                     }
-                    await signInManager.SignInAsync(user, isPersistent: false);
-                    return RedirectToAction("index", "home");
+                    ViewBag.ErrorTitle = "Registration successful";
+                    ViewBag.ErrorMessage = "Before you can Login, please confirm your " +
+                            "email, by clicking on the confirmation link we have emailed you";
+                    return View("Error");
                 }
                 // If there are any errors, add them to the ModelState object
                 // which will be displayed by the validation summary tag helper
@@ -62,6 +72,32 @@ namespace DotnetCoreIdentityAuthDemo.Controllers
                 }
             }
             return View(registerViewModel);
+        }
+
+        [HttpGet]
+        [AllowAnonymous]
+        public async Task<IActionResult> ConfirmEmail(string userId, string token)
+        {
+            if (userId == null || token == null)
+            {
+                return RedirectToAction("index", "home");
+            }
+
+            var user = await userManager.FindByIdAsync(userId);
+            if (user == null)
+            {
+                ViewBag.ErrorMessage = $"The User ID {userId} is invalid";
+                return View("NotFound");
+            }
+
+            var result = await userManager.ConfirmEmailAsync(user, token);
+            if (result.Succeeded)
+            {
+                return View();
+            }
+
+            ViewBag.ErrorTitle = "Email cannot be confirmed";
+            return View("Error");
         }
 
         #endregion
@@ -96,13 +132,13 @@ namespace DotnetCoreIdentityAuthDemo.Controllers
             {
                 #region check email confirmation has been done for the user
 
-                //var user = await userManager.FindByEmailAsync(loginViewModel.Email);
+                var user = await userManager.FindByEmailAsync(loginViewModel.Email);
 
-                //if (user != null && !user.EmailConfirmed && (await userManager.CheckPasswordAsync(user, loginViewModel.Password)))
-                //{
-                //    ModelState.AddModelError(string.Empty, "Email Not confirmed yer!!");
-                //    return View(loginViewModel);
-                //}
+                if (user != null && !user.EmailConfirmed && (await userManager.CheckPasswordAsync(user, loginViewModel.Password)))
+                {
+                    ModelState.AddModelError(string.Empty, "Email Not confirmed yet!!");
+                    return View(loginViewModel);
+                }
                 #endregion
 
                 var result = await signInManager.PasswordSignInAsync(loginViewModel.Email, loginViewModel.Password, loginViewModel.RememberMe, false);
@@ -187,6 +223,20 @@ namespace DotnetCoreIdentityAuthDemo.Controllers
                 return View("Login", loginViewModel);
             }
 
+            // Get the email claim value
+            var email = info.Principal.FindFirstValue(ClaimTypes.Email);
+            CustomUser user = null;
+
+            if (email != null)
+            {
+                user = await userManager.FindByNameAsync(email);
+                if (user != null && !user.EmailConfirmed)
+                {
+                    ModelState.AddModelError(string.Empty, "Email not confirmed yet");
+                    return View("Login", loginViewModel);
+                }
+            }
+
             // If the user already has a login (i.e if there is a record in AspNetUserLogins
             // table) then sign-in the user with this external login provider
             var signInResult = await signInManager.ExternalLoginSignInAsync(info.LoginProvider, info.ProviderKey, isPersistent: false, bypassTwoFactor: true);
@@ -199,13 +249,10 @@ namespace DotnetCoreIdentityAuthDemo.Controllers
             // a local account
             else
             {
-                // Get the email claim value
-                var email = info.Principal.FindFirstValue(ClaimTypes.Email);
+
 
                 if (email != null)
                 {
-                    // Create a new user without password if we do not have a user already
-                    var user = await userManager.FindByEmailAsync(email);
 
                     if (user == null)
                     {
