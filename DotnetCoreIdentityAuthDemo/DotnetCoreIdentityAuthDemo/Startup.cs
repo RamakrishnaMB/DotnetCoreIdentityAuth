@@ -39,9 +39,17 @@ namespace DotnetCoreIdentityAuthDemo
                 options.Password.RequireNonAlphanumeric = false;
                 options.Password.RequireUppercase = false;
                 options.SignIn.RequireConfirmedEmail = true;
-            }).AddEntityFrameworkStores<ConnectToDB>().AddDefaultTokenProviders();
-
+                options.Tokens.EmailConfirmationTokenProvider = "CustomEmailConfirmation";
+            })
+            .AddEntityFrameworkStores<ConnectToDB>()
+            .AddDefaultTokenProviders()
+            .AddTokenProvider<CustomEmailConfirmationTokenProvider<CustomUser>>("CustomEmailConfirmation");
+            //set all other type of token lifespan.
             services.Configure<DataProtectionTokenProviderOptions>(o => o.TokenLifespan = TimeSpan.FromHours(5));
+            //change email token expirty to 3 days.
+            services.Configure<CustomEmailConfirmationTokenProviderOptions>(o => o.TokenLifespan = TimeSpan.FromDays(3));
+
+
             services.AddMvc(options =>
                {
                    var pilicy = new AuthorizationPolicyBuilder().RequireAuthenticatedUser().Build();
