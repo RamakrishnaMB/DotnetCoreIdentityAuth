@@ -32,7 +32,8 @@
                         </li>
 
 
-                        @if (signInManager.IsSignedIn(User) && User.IsInRole("admin"))
+                        @*@if (signInManager.IsSignedIn(User) && User.IsInRole("admin"))*@
+                        @if (signInManager.IsSignedIn(User))
                         {
                             <li class="nav-item dropdown">
                                 <a class="nav-link dropdown-toggle" href="#" id="navbarDropdownMenuLink"

@@ -395,8 +395,17 @@ namespace DotnetCoreIdentityAuthDemo.Controllers
 
         #region ChangePassword
         [HttpGet]
-        public IActionResult ChangePassword()
+        public async Task<IActionResult> ChangePasswordAsync()
         {
+            //below code for external login like google , facebook etc. if user  don't have pwd in local db, then add one in change password link.
+            var user = await userManager.GetUserAsync(User);
+
+            var userHasPassword = await userManager.HasPasswordAsync(user);
+
+            if (!userHasPassword)
+            {
+                return RedirectToAction("AddPassword");
+            }
             return View();
         }
 
@@ -431,6 +440,52 @@ namespace DotnetCoreIdentityAuthDemo.Controllers
                 // Upon successfully changing the password refresh sign-in cookie
                 await signInManager.RefreshSignInAsync(user);
                 return View("ChangePasswordConfirmation");
+            }
+
+            return View(model);
+        }
+
+        #endregion
+
+
+        #region Link external account with local password
+
+        [HttpGet]
+        public async Task<IActionResult> AddPassword()
+        {
+            var user = await userManager.GetUserAsync(User);
+
+            var userHasPassword = await userManager.HasPasswordAsync(user);
+
+            if (userHasPassword)
+            {
+                return RedirectToAction("ChangePassword");
+            }
+
+            return View();
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> AddPassword(AddPasswordViewModel model)
+        {
+            if (ModelState.IsValid)
+            {
+                var user = await userManager.GetUserAsync(User);
+
+                var result = await userManager.AddPasswordAsync(user, model.NewPassword);
+
+                if (!result.Succeeded)
+                {
+                    foreach (var error in result.Errors)
+                    {
+                        ModelState.AddModelError(string.Empty, error.Description);
+                    }
+                    return View();
+                }
+
+                await signInManager.RefreshSignInAsync(user);
+
+                return View("AddPasswordConfirmation");
             }
 
             return View(model);
