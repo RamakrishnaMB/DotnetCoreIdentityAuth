@@ -141,7 +141,7 @@ namespace DotnetCoreIdentityAuthDemo.Controllers
                 }
                 #endregion
 
-                var result = await signInManager.PasswordSignInAsync(loginViewModel.Email, loginViewModel.Password, loginViewModel.RememberMe, false);
+                var result = await signInManager.PasswordSignInAsync(loginViewModel.Email, loginViewModel.Password, loginViewModel.RememberMe, true);
                 if (result.Succeeded)
                 {
                     // to prevent Open redirect vulnerability example
@@ -154,6 +154,12 @@ namespace DotnetCoreIdentityAuthDemo.Controllers
                         return RedirectToAction("index", "home");
                     }
                 }
+
+                if (result.IsLockedOut)
+                {
+                    return View("AccountLocked");
+                }
+
                 // If there are any errors, add them to the ModelState object
                 // which will be displayed by the validation summary tag helper
                 ModelState.AddModelError(string.Empty, "Invalid Login Attempt");
@@ -371,6 +377,11 @@ namespace DotnetCoreIdentityAuthDemo.Controllers
                     var result = await userManager.ResetPasswordAsync(user, model.Token, model.Password);
                     if (result.Succeeded)
                     {
+                        //below if condition for reset of lockout account when after failed attempt login . then password reset happend.
+                        if (await userManager.IsLockedOutAsync(user))
+                        {
+                            await userManager.SetLockoutEndDateAsync(user, DateTimeOffset.UtcNow);
+                        }
                         return View("ResetPasswordConfirmation");
                     }
                     // Display validation errors. For example, password reset token already
